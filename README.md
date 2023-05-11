@@ -8,6 +8,9 @@ Reference:
 
 **Canvas size**: 1280 x 720
 
+## Specifications Document
+- [CMSC 161 - Crossy River](https://docs.google.com/document/d/1xYqdcXD20pEKx_FY8n8RdX8k-wRNRtCpCi-b-Djtyfc/edit?usp=sharing): This file contains details regarding the game mechanics, logic, controls, events, etc.
+
 ## First tasks allocation (Deadline: Friday, 12 May 2023):
 Characters (Sean):
 - Rectangular prisms
