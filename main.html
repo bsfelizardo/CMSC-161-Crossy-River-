@@ -41,7 +41,7 @@
   <option value="blend9">Blend 9</option>
   <option value="blend10">Blend 10</option>
   <option value="blend11">Blend 11</option>
-  <option value="blend12">Blend 12</option>
+  <option value="blend12">Blend 12</option> n 
   <option value="blend13">Blend 13</option>
   <option value="blend14">Blend 14</option>
   <option value="blend15">Blend 15</option>
@@ -178,7 +178,92 @@
     const uViewMatrixPointer = gl.getUniformLocation(program, 'u_view_matrix');
     const uProjectionMatrixPointer = gl.getUniformLocation(program, 'u_projection_matrix');
 
-    var vertices = [
+    var vertices1 = [
+      // head
+      -0.1, 0.7, 0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+      0.1, 0.4, 0.1, 1,
+
+      0.1, 0.4, 0.1, 1,
+      0.1, 0.7, 0.1, 1,
+      -0.1, 0.7, 0.1, 1,
+
+      // upper body
+      -0.1, 0.4, 0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+      0.1, -0.3, 0.1, 1,
+
+      0.1, -0.3, 0.1, 1,
+      0.1, 0.4, 0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+
+      // lower body
+      -0.1, -0.3, 0.1, 1,
+      -0.1, -0.7, 0.1, 1,
+      0.1, -0.7, 0.1, 1,
+
+      0.1, -0.7, 0.1, 1,
+      0.1, -0.3, 0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+    ]
+
+    // z axis
+    var vertices3 = [
+      // head
+      -0.1, 0.7, 0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+      -0.1, 0.4, -0.1, 1,
+
+      -0.1, 0.4, -0.1, 1,
+      -0.1, 0.7, -0.1, 1,
+      -0.1, 0.7, 0.1, 1,
+
+      // upper body
+      -0.1, 0.4, 0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+      -0.1, -0.3, -0.1, 1,
+
+      -0.1, -0.3, -0.1, 1,
+      -0.1, 0.4, -0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+
+      // lower body
+      -0.1, -0.3, 0.1, 1,
+      -0.1, -0.7, 0.1, 1,
+      -0.1, -0.7, -0.1, 1,
+
+      -0.1, -0.7, -0.1, 1,
+      -0.1, -0.3, -0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+    ]
+
+    var eyes = [
+      // eyebrow
+      -0.07, 0.57, 0, 1,
+      -0.07, 0.60, 0, 1,
+      -0.03, 0.60, 0, 1,
+
+      -0.03, 0.60, 0, 1,
+      -0.07, 0.57, 0, 1,
+      -0.03, 0.57, 0, 1,
+
+      // side
+      -0.03, 0.57, 0, 1,
+      -0.05, 0.57, 0, 1,
+      -0.05, 0.52, 0, 1,
+
+      -0.05, 0.52, 0, 1,
+      -0.03, 0.52, 0, 1,
+      -0.03, 0.57, 0, 1,
+
+      // pupil
+      -0.07, 0.57, 0, 1,
+      -0.07, 0.52, 0, 1,
+      -0.05, 0.52, 0, 1,
+
+      -0.05, 0.52, 0, 1,
+      -0.05, 0.57, 0, 1,
+      -0.07, 0.57, 0, 1,
     ]
 
     //Initializing the variables and tranformation matrix
@@ -193,11 +278,21 @@
       varx,vary,0,1
     ];
 
-    vertices2 = vertices.map((x) => x);
+    vertices2 = vertices1.map((x) => x);
+    vertices4 = vertices3.map((x) => x);
+    eyes2 = eyes.map((x) => x);
     // z1_vertex = z_vertex.map((x) => x);     
 
     for (let i = 2; i < vertices2.length; i+=4){
       vertices2[i] = -0.1
+    }
+
+    for (let i = 0; i < vertices4.length; i+=4){
+      vertices4[i] = 0.1
+    }
+
+    for (let i = 0; i < eyes2.length; i+=4){
+      eyes2[i] = eyes2[i] * -1
     }
 
     
@@ -205,10 +300,10 @@
     //   z1_vertex[i] = z1_vertex[i] * -1
     // }
 
-    all_vertex = vertices.map((x) => x);
-    for (let i = 0; i < vertices2.length; i++){
-      all_vertex.push(vertices2[i])
-    }
+    // all_vertex = vertices2.map((x) => x);
+    // for (let i = 0; i < vertices2.length; i++){
+    //   all_vertex.push(vertices2[i])
+    // }
     // for (let i = 0; i < z_vertex.length; i++){
     //   all_vertex.push(z_vertex[i])
     // }
@@ -216,9 +311,34 @@
     //   all_vertex.push(z1_vertex[i])
     // }
 
-    const all_buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, all_buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(all_vertex), gl.STATIC_DRAW);
+    const vertices1B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices1B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices2B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices2B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices3B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices3), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices4B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices4B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices4), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const eyeBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, eyeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(eyes), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const eye2Buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, eye2Buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(eyes2), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
 
@@ -247,24 +367,62 @@
     function drawScene() {
 
       // enable attrib array
-      gl.enableVertexAttribArray(aPositionPointer);
+        gl.enableVertexAttribArray(aPositionPointer);
 
-      // load uniforms (only done once; since values are same for all vertices)
-      gl.uniformMatrix4fv(uModelMatrixPointer, false, new Float32Array(modelMatrix));
-      gl.uniformMatrix4fv(uViewMatrixPointer, false, new Float32Array(viewMatrix));
-      gl.uniformMatrix4fv(uProjectionMatrixPointer, false, new Float32Array(projectionMatrix));
-      // set values
-      gl.uniformMatrix4fv(uTransformationMatrixPointer, false, new Float32Array(transformationMatrix));
+        // load uniforms (only done once; since values are same for all vertices)
+        gl.uniformMatrix4fv(uModelMatrixPointer, false, new Float32Array(modelMatrix));
+        gl.uniformMatrix4fv(uViewMatrixPointer, false, new Float32Array(viewMatrix));
+        gl.uniformMatrix4fv(uProjectionMatrixPointer, false, new Float32Array(projectionMatrix));
+        // set values
+        gl.uniformMatrix4fv(uTransformationMatrixPointer, false, new Float32Array(transformationMatrix));
 
-      // clear the screen
-      gl.clearColor(.6602, .6602, .6602, 1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
+        // clear the screen
+        gl.clearColor(.6602, .6602, .6602, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
-        // --- Back
-        gl.bindBuffer(gl.ARRAY_BUFFER, all_buffer);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices2B);
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.5);
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, 11);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.9);
+        gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices1B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.8510, 0.7490, 0.5176, 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.7);
+        gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices4B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.8);
+        gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, eyeBuffer);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 12);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, eyeBuffer);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 255, 255, 255, 1);
+        gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, eye2Buffer);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 12);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, eye2Buffer);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 255, 255, 255, 1);
+        gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+
 
 
 
