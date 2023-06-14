@@ -119,40 +119,40 @@
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lower_land), gl.STATIC_DRAW);
       gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_front_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_front_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_front), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const front_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_front), gl.DYNAMIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_back_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_back_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_back), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const back_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, back_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_back), gl.STATIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_left_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_left_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_left), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const left_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, left_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_left), gl.STATIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_right_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_right_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_right), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const right_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, right_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_right), gl.STATIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_lefteye_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_lefteye_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_lefteye), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const lefteye_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_lefteye), gl.STATIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_righteye_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_righteye_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_righteye), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const righteye_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_righteye), gl.STATIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      const char_head_top_buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, char_head_top_buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_top), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      // const top_buffer = gl.createBuffer();
+      // gl.bindBuffer(gl.ARRAY_BUFFER, top_buffer);
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_top), gl.STATIC_DRAW);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
 
       // setup model matrix;
@@ -224,54 +224,90 @@
         gl.disable(gl.DEPTH_TEST);
         // character [start]
         
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_lefteye_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 0, 0, 0, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 12);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_lefteye_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 255, 255, 255, 1);
-        gl.drawArrays(gl.TRIANGLES, 12, 6);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_righteye_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 0, 0, 0, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 12);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_righteye_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 255, 255, 255, 1);
-        gl.drawArrays(gl.TRIANGLES, 12, 6);
-
-        
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_front_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_left_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 18);
        
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_back_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        
+        start_to_river(
+          {destination:"start",
+            origin: "start",
+            gl,
+            aPositionPointer,
+            colorLocation,
+          })
+
+          start_to_river(
+          {destination:"river",
+            origin: "upper",
+            gl,
+            aPositionPointer,
+            colorLocation,
+          })
+
+          start_to_river(
+          {destination:"lower",
+            origin: "river",
+            gl,
+            aPositionPointer,
+            colorLocation,
+          })
+
+
+          start_to_river(
+          {destination:"river",
+            origin: "lower",
+            gl,
+            aPositionPointer,
+            colorLocation,
+          })
+
+
+          
+        // gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
+        // gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, left_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
         // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 18);
+        // gl.drawArrays(gl.TRIANGLES, 0, 18);
+       
+        // gl.bindBuffer(gl.ARRAY_BUFFER, back_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
+        // gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 18);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_right_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 18);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 12);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, char_head_top_buffer);
-        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation, 0, 0, 0, 1);
-        gl.drawArrays(gl.TRIANGLES, 0, 12);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 255, 255, 255, 1);
+        // gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 12);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 255, 255, 255, 1);
+        // gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, right_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, top_buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 12);
+        
         // character [end]
 
         gl.enable(gl.DEPTH_TEST);
