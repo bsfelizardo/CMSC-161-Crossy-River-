@@ -1,0 +1,460 @@
+<!doctype html>
+<html>
+<head>
+  <title>WebGL Demo</title>
+</head>
+
+<body>
+    <canvas id="output" width="1280" height="720"></canvas>
+ <br>
+ <!-- USER INTERFACE -->
+ <h4>AFFINE TRANSFORMATION</h4>
+ <button id="translateX">MOVE X</button>  
+ <button id="translateY">MOVE Y</button>
+ <button id="translate">MOVE</button>
+ <button id="scale">SCALE</button>
+ <button id="rotate">ROTATE</button>
+ <br>
+ X = <input type="text" id="tx" value="0">
+ Y = <input type="text" id="ty" value="0">
+ <br>
+ SCALE X by = <input type="text" id="Sx" value="0">
+ SCALE Y by = <input type="text" id="Sy" value="0">
+<br>
+ROTATION ANGLE = <input type="number" id="deg" value="0">
+<br>
+<br>
+<h4>VIEW TRANSFORMATION</h4>
+<b>Viewpoint</b>
+<br>
+X: <input type="range" id="viewpx" min="-1" max="1" step="0.01" value="0">
+Y: <input type="range" id="viewpy" min="-1" max="1" step="0.01" value="0">
+Z: <input type="range" id="viewpz" min="-1" max="1" step="0.01" value="0">
+<br>
+<b>Center Point</b>
+<br>
+X: <input type="range" id="centerpx" min="-1" max="1" step="0.01" value="0">
+Y: <input type="range" id="centerpy" min="-1" max="1" step="0.01" value="0">
+Z: <input type="range" id="centerpz" min="-1" max="1" step="0.01" value="0">
+<br>
+<b>Up Vector</b>
+<br>
+X: <input type="range" id="upvx" min="-1" max="1" step="0.01" value="0">
+Y: <input type="range" id="upvy" min="-1" max="1" step="0.01" value="0">
+Z: <input type="range" id="upvz" min="-1" max="1" step="0.01" value="0">
+<br>
+<br>
+<h4>MODEL TRANSFORMATION</h4>
+<b>Translate</b>
+<br>
+X: <input type="range" id="modelTx" min="-1" max="1" step="0.01" value="0">
+Y: <input type="range" id="modelTy" min="-1" max="1" step="0.01" value="0">
+Z: <input type="range" id="modelTz" min="-1" max="1" step="0.01" value="0">
+<br>
+<b>Rotation</b>
+<br>
+X: <input type="range" id="rotatex" min="-360" max="360" step="10" value="0">
+Y: <input type="range" id="rotatey" min="-360" max="360" step="10" value="0">
+Z: <input type="range" id="rotatez" min="-360" max="360" step="10" value="0">
+<br>
+  
+   <script src="./utils/gl-matrix.js"></script>
+  <!-- VERTEX SHADER -->
+  <script id="vertex-shader" type="notjs">#version 300 es
+    in vec4 a_position;
+    in float a_point_size;
+    //transformation matrix
+    uniform mat4 u_transformation_matrix_translation;
+    uniform mat4 u_transformation_matrix_scaling;
+    uniform mat4 u_transformation_matrix_rotation;
+    
+    //For view, model, and projection transformations
+    uniform mat4 u_model_matrix;
+    uniform mat4 u_view_matrix;
+    uniform mat4 u_projection_matrix;
+
+    void main() {
+      //Apply the transformations to the object to be rendered
+      gl_Position = u_transformation_matrix_translation * u_transformation_matrix_scaling * u_transformation_matrix_rotation * u_view_matrix * u_model_matrix * u_projection_matrix * a_position;
+    }
+  </script>
+
+  <!-- FRAGMENT SHADER -->
+  <script id="fragment-shader" type="notjs">#version 300 es
+    precision mediump float;
+
+    uniform vec4 u_color;
+    out vec4 outColor;
+
+    void main(void) {
+      //outColor = vec4(1, 0, 0, 1); //red
+    
+      outColor = u_color;
+    }
+
+    
+  </script>
+
+  <!-- Function for creating and compiling shader programs -->
+  <script>
+  function createShader (gl, type, sourceCode) {
+  // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
+  var shader = gl.createShader( type );
+  gl.shaderSource( shader, sourceCode );
+  gl.compileShader( shader );
+
+  if ( !gl.getShaderParameter(shader, gl.COMPILE_STATUS) ) {
+    var info = gl.getShaderInfoLog( shader );
+    throw 'Could not compile WebGL program. \n\n' + info;
+  }
+  return shader;
+}
+</script>
+  
+  <!-- Main function contains: 
+    1) declaration of WebGL context
+    2) function calls to initialize the shader programs
+    3) declaration and binding of buffer object
+    4) function calls to perform transformations before drawing
+    5) draw/redraw functions
+  -->
+  <script> 
+    function main() {
+      const canvas = document.querySelector('#output');
+      if(!canvas){
+        console.log("Canvas element with specified ID ('output') cannot be found.");
+      }
+//const gl = initWebGL(canvas, true);
+      //Setting up the WebGL Context
+      const gl = canvas.getContext('webgl2');
+      const vertexShaderSource = document.querySelector('#vertex-shader').text;
+      const fragmentShaderSource = document.querySelector('#fragment-shader').text;
+      const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+      const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+      
+
+      //Creation and initialization of GL program 
+      var program = gl.createProgram();
+
+      // Attach pre-existing shaders
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+
+      gl.linkProgram(program);
+
+      if ( !gl.getProgramParameter( program, gl.LINK_STATUS) ) {
+        var info = gl.getProgramInfoLog(program);
+        throw 'Could not compile WebGL program. \n\n' + info;
+      }
+
+      // set the program created earlier
+      gl.useProgram(program);
+
+      // Declaration of pointers to the attributes
+      const aPositionPointer = gl.getAttribLocation(program, 'a_position');
+      const aPointSizePointer = gl.getAttribLocation(program, 'a_point_size');
+
+     var colorLocation = gl.getUniformLocation(program, "u_color");
+     
+     //Used for affine transformation
+     const uTransformationMatrixPointer_Translation = gl.getUniformLocation(program, 'u_transformation_matrix_translation');
+     const uTransformationMatrixPointer_Scaling = gl.getUniformLocation(program, 'u_transformation_matrix_scaling');
+     const uTransformationMatrixPointer_Rotation = gl.getUniformLocation(program, 'u_transformation_matrix_rotation');
+
+     const uModelMatrixPointer = gl.getUniformLocation(program, 'u_model_matrix');
+      const uViewMatrixPointer = gl.getUniformLocation(program, 'u_view_matrix');
+      const uProjectionMatrixPointer = gl.getUniformLocation(program, 'u_projection_matrix');
+      
+    var vertices1 = [
+        -0.1, 0.7, 0.1, 1,
+        -0.1, 0.4, 0.1, 1,
+        0.1, 0.4, 0.1, 1,
+
+        0.1, 0.4, 0.1, 1,
+        0.1, 0.7, 0.1, 1,
+        -0.1, 0.7, 0.1, 1,
+    ]
+
+    // z axis
+    var vertices3 = [
+        -0.1, 0.7, 0.1, 1,
+        -0.1, 0.4, 0.1, 1,
+        -0.1, 0.4, -0.1, 1,
+
+        -0.1, 0.4, -0.1, 1,
+        -0.1, 0.7, -0.1, 1,
+        -0.1, 0.7, 0.1, 1,
+    ]
+
+    vertices2 = vertices1.map((x) => x);
+    vertices4 = vertices3.map((x) => x);
+    // z1_vertex = z_vertex.map((x) => x);     
+
+    for (let i = 2; i < vertices2.length; i+=4){
+      vertices2[i] = -0.1
+    }
+
+    for (let i = 0; i < vertices4.length; i+=4){
+      vertices4[i] = 0.1
+    }
+
+
+
+      
+      //Initializing the variables and tranformation matrix
+      var tx=0, ty=0;
+      let transformationMatrix_translation = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+      ];
+      
+      let transformationMatrix_scaling = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+      ];
+
+      let transformationMatrix_rotation = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+      ];
+
+      
+    const vertices1B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices1B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices2B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices2B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices3B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices3), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices4B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices4), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      // setup model matrix;
+      modelTranslate = [
+        Number((document.getElementById("modelTx")).value),
+        Number((document.getElementById("modelTy")).value),
+        Number((document.getElementById("modelTz")).value),
+        0
+      ]
+
+      const modelMatrix = glMatrix.mat4.create();
+      glMatrix.mat4.translate(modelMatrix, modelMatrix, modelTranslate);
+      glMatrix.mat4.rotateX(modelMatrix, modelMatrix, glMatrix.glMatrix.toRadian(0));
+      glMatrix.mat4.rotateY(modelMatrix, modelMatrix, glMatrix.glMatrix.toRadian(0));
+      glMatrix.mat4.rotateZ(modelMatrix, modelMatrix, glMatrix.glMatrix.toRadian(0));
+
+      viewPoint = [
+        Number((document.getElementById("viewpx")).value),
+        Number((document.getElementById("viewpy")).value),
+        Number((document.getElementById("viewpz")).value),
+        1
+      ]
+      centerPoint = [
+        Number((document.getElementById("centerpx")).value),
+        Number((document.getElementById("centerpy")).value),
+        Number((document.getElementById("centerpz")).value),
+        1
+      ]
+      upVector = [
+        Number((document.getElementById("upvx")).value),
+        Number((document.getElementById("upvy")).value),
+        Number((document.getElementById("upvz")).value),
+        0
+      ]
+
+      // setup view matrix
+      const viewMatrix = glMatrix.mat4.create();
+      glMatrix.mat4.lookAt(
+        viewMatrix, 
+        viewPoint,
+        centerPoint,
+        upVector
+      );
+    //   glMatrix.mat4.lookAt(viewMatrix,[0,0,0,1],[0,0,0,1],[0,1,0,0]);
+      
+
+      // setup projection matrix
+      const projectionMatrix = glMatrix.mat4.create();
+      // parameters to set parallel projection
+      var left = -1;
+    var right = 1;
+    var bottom = -1;
+    var top = 1;
+    var near = -1;
+    var far = 1;
+      glMatrix.mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
+
+     
+
+// function to draw the scene from the user inputs
+      function drawScene() {
+      
+      // enable attrib array
+      gl.enableVertexAttribArray(aPositionPointer);
+      
+      // load uniforms (only done once; since values are same for all vertices)
+      gl.uniformMatrix4fv(uModelMatrixPointer, false, new Float32Array(modelMatrix));
+      gl.uniformMatrix4fv(uViewMatrixPointer, false, new Float32Array(viewMatrix));
+      gl.uniformMatrix4fv(uProjectionMatrixPointer, false, new Float32Array(projectionMatrix));
+       // set values
+       gl.uniformMatrix4fv(uTransformationMatrixPointer_Translation, false, new Float32Array(transformationMatrix_translation));
+        gl.uniformMatrix4fv(uTransformationMatrixPointer_Scaling, false, new Float32Array(transformationMatrix_scaling));
+        gl.uniformMatrix4fv(uTransformationMatrixPointer_Rotation, false, new Float32Array(transformationMatrix_rotation));
+        
+        
+        // clear the screen
+        gl.clearColor(.6602, .6602, .6602, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices2B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.9);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 6);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices1B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.5);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 6);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.7);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 6);
+
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertices4B);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.8);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 6);
+
+      }
+
+      // initial render
+      drawScene();
+      
+      //Declaration and initialization of translation,scaling,rotation factors
+      let tr_x=0, tr_y=0, Sx=1, Sy=1;
+      let degrees = 0;
+
+      function redraw(code){
+      	return function(){
+        	if (code=="tx") tr_x = tr_x + Number((document.getElementById("tx")).value); 
+      		if (code=="ty") tr_y = tr_y + Number((document.getElementById("ty")).value);
+          if (code=="both"){
+            tr_x = tr_x + Number((document.getElementById("tx")).value);
+            tr_y = tr_y + Number((document.getElementById("ty")).value);
+          }
+          if(code=="rotate") degrees = degrees + Number((document.getElementById("deg")).value);
+          if (code=="scaled"){
+            Sx = Sx + Number((document.getElementById("Sx")).value);
+            Sy = Sy + Number((document.getElementById("Sy")).value);
+          }
+
+          transformationMatrix_translation = [
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            tr_x,tr_y,0,1
+          ];
+
+          //Transformation matrix when scaling
+          transformationMatrix_scaling = [
+            Sx,0,0,0,
+            0,Sy,0,0,
+            0,0,1,0,
+            0,0,0,1
+          ];
+        
+          let radians = Math.PI*degrees/180;
+          let cosValue = Math.cos(radians);
+          let sinValue = Math.sin(radians);
+
+          transformationMatrix_rotation = [
+            cosValue,sinValue , 0, 0,
+            -1*sinValue, cosValue, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+          ]
+
+          if(code=="viewpx") viewPoint[0] = Number((document.getElementById("viewpx")).value)
+          if(code=="viewpy") viewPoint[1] = Number((document.getElementById("viewpy")).value)
+          if(code=="viewpz") viewPoint[2] = Number((document.getElementById("viewpz")).value)
+
+          if(code=="centerpx") centerPoint[0] = Number((document.getElementById("centerpx")).value)
+          if(code=="centerpy") centerPoint[1] = Number((document.getElementById("centerpy")).value)
+          if(code=="centerpz") centerPoint[2] = Number((document.getElementById("centerpz")).value)
+
+          if(code=="upvx") upVector[0] = Number((document.getElementById("upvx")).value)
+          if(code=="upvy") upVector[1] = Number((document.getElementById("upvy")).value)
+          if(code=="upvz") upVector[2] = Number((document.getElementById("upvz")).value)
+
+          if(code=="modelTx") modelTranslate[0] = Number((document.getElementById("modelTx")).value)
+          if(code=="modelTy") modelTranslate[1] = Number((document.getElementById("modelTy")).value)
+          if(code=="modelTz") modelTranslate[2] = Number((document.getElementById("modelTz")).value)
+
+          if(code=="rotatex") glMatrix.mat4.rotateX(modelMatrix, modelMatrix, glMatrix.glMatrix.toRadian(Number((document.getElementById("rotatex")).value))) 
+          if(code=="rotatey") glMatrix.mat4.rotateY(modelMatrix, modelMatrix, glMatrix.glMatrix.toRadian(Number((document.getElementById("rotatey")).value)))
+          if(code=="rotatez") glMatrix.mat4.rotateZ(modelMatrix, modelMatrix, glMatrix.glMatrix.toRadian(Number((document.getElementById("rotatez")).value)))
+          
+
+          glMatrix.mat4.translate(modelMatrix, modelMatrix, modelTranslate);
+          glMatrix.mat4.lookAt(
+            viewMatrix, 
+            viewPoint,
+            centerPoint,
+            upVector
+          );
+          //rendering again after reflecting the transformations
+          drawScene();
+        }
+      }
+
+      //Event listeners for user inputs for the transformations
+     document.getElementById("translateX").addEventListener("click", redraw("tx"));
+     document.getElementById("translateY").addEventListener("click", redraw("ty"));
+     document.getElementById("translate").addEventListener("click", redraw("both"));
+     document.getElementById("scale").addEventListener("click",redraw("scaled"));
+     document.getElementById("rotate").addEventListener("click",redraw("rotate"));
+
+     document.getElementById("viewpx").addEventListener("input",redraw("viewpx"));
+     document.getElementById("viewpy").addEventListener("input",redraw("viewpy"));
+     document.getElementById("viewpz").addEventListener("input",redraw("viewpz"));
+
+     document.getElementById("centerpx").addEventListener("input",redraw("centerpx"));
+     document.getElementById("centerpy").addEventListener("input",redraw("centerpy"));
+     document.getElementById("centerpz").addEventListener("input",redraw("centerpz"));
+
+     document.getElementById("upvx").addEventListener("input",redraw("upvx"));
+     document.getElementById("upvy").addEventListener("input",redraw("upvy"));
+     document.getElementById("upvz").addEventListener("input",redraw("upvz"));
+
+     document.getElementById("modelTx").addEventListener("input",redraw("modelTx"));
+     document.getElementById("modelTy").addEventListener("input",redraw("modelTy"));
+     document.getElementById("modelTz").addEventListener("input",redraw("modelTz"));
+
+     document.getElementById("rotatex").addEventListener("input",redraw("rotatex"));
+     document.getElementById("rotatey").addEventListener("input",redraw("rotatey"));
+     document.getElementById("rotatez").addEventListener("input",redraw("rotatez"));
+}
+    // call the main program
+    main();
+  </script>
+</body>
+</html>
