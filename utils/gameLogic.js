@@ -56,29 +56,44 @@ const listen = (cb) => {
     window.onkeyup = (key) => {
         console.log(key.key);
 
-        if ([1,2,3,4,5,6,7,8].includes(parseInt(key.key))) character = parseInt(key.key);
+        if ([1,2,3,4,5,6,7,8].includes(parseInt(key.key))) {
+            character = parseInt(key.key);
+            return;
+        }
 
         console.log(`character: ${character}`)
 
-        if ((key.key == "ArrowUp" || key.key == "ArrowDown") && character == 0) window.alert("Error: move without selected character");
+        if ((key.key == "ArrowUp" || key.key == "ArrowDown") && character == 0) window.alert("Error: Move without selected character. Please select a character before moving");
 
         else {
             move = key.key;
 
             // check if move is valid
-            if (!checkIfValid(characters[character].location, move)) return;
+            if (!checkIfValid(characters[character].location, move)) {
+                window.alert("Error: Invalid move for this character's current position.")
+                return;
+            }
             console.log("after check if valid")
 
             // check if raft is full
-            if (raft_properties.passenger_1>0 && raft_properties.passenger_2>0) return;
+            if ((raft_properties.passenger_1>0 && raft_properties.passenger_2>0) && (![raft_properties.passenger_1, raft_properties.passenger_2].includes(character))) {
+                window.alert("Error: Raft is already full")
+                return;
+            };
             console.log("after check of passenger")
 
             // check compatibility with other passengers
-            if (raft_properties.passenger_1>0 || raft_properties.passenger_2>0 && !compatible(character)) return;
+            if ((raft_properties.passenger_1>0 || raft_properties.passenger_2>0) && !compatible(character)) {
+                window.alert("Error: Characters are incompatible")
+                return;
+            }
             console.log("after check of compatibility")
 
             // make sure adults ride first before others
-            if (!raft_properties.passenger_1>0 && !raft_properties.passenger_2>0 && !characters[character.adult]) return;
+            if (!raft_properties.passenger_1>0 && !raft_properties.passenger_2>0 && !characters[character].adult) {
+                window.alert("Error: No adults on the raft")
+                return;
+            }
 
             // do specified actions
             const origin = characters[character].location
@@ -102,11 +117,19 @@ const checkIfValid = (location, move) => {
 }
 
 const compatible = (character) => {
+    if (raft_properties.passenger_1 == character || raft_properties.passenger_2 == character) return true;
+
     current = raft_properties.passenger_1 > raft_properties.passenger_2 ? raft_properties.passenger_1 : raft_properties.passenger_2;
 
-    if (characters[current].not_compatible.includes(character)) return false;
+    if (characters[current].not_compatible.includes(character)) {
+        window.alert("Error: These characters are not allowed to use the raft at the same time")
+        return false;
+    }
 
-    if (!characters[current].adult && !characters[character.adult]) return false;
+    if (!characters[current].adult && !characters[character].adult) {
+        window.alert("Error: Error: There are no adults on the raft")
+        return false;
+    }
 
     return true
 }
@@ -122,8 +145,8 @@ const getDestination = (origin, move) => {
 const updateRaftProperties = (origin, character) => {
     const {passenger_1, passenger_2} = raft_properties
     if (origin == "river") {
-        if (character == passenger_1) passenger_1 = 0;
-        if (character == passenger_2) passenger_2 = 0;
+        if (character == passenger_1) raft_properties.passenger_1 = 0;
+        if (character == passenger_2) raft_properties.passenger_2 = 0;
         return;
     }
 
