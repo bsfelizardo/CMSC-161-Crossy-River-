@@ -226,12 +226,29 @@
        
         
         start_to_river(
+          {destination:"start",
+            origin: "start",
+            gl,
+            aPositionPointer,
+            colorLocation,
+          })
+
+          start_to_river(
           {destination:"river",
             origin: "upper",
             gl,
             aPositionPointer,
             colorLocation,
           })
+
+          start_to_river(
+          {destination:"lower",
+            origin: "river",
+            gl,
+            aPositionPointer,
+            colorLocation,
+          })
+
 
           
         // gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
