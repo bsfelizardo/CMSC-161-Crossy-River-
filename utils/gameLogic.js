@@ -60,7 +60,7 @@ const listen = (cb) => {
 
         console.log(`character: ${character}`)
 
-        if ((key.key == "ArrowUp" || key.key == "ArrowDown") && character == 0) console.log("Error: move without selected character");
+        if ((key.key == "ArrowUp" || key.key == "ArrowDown") && character == 0) window.alert("Error: move without selected character");
 
         else {
             move = key.key;
@@ -76,6 +76,9 @@ const listen = (cb) => {
             // check compatibility with other passengers
             if (raft_properties.passenger_1>0 || raft_properties.passenger_2>0 && !compatible(character)) return;
             console.log("after check of compatibility")
+
+            // make sure adults ride first before others
+            if (!raft_properties.passenger_1>0 && !raft_properties.passenger_2>0 && !characters[character.adult]) return;
 
             // do specified actions
             const origin = characters[character].location
@@ -124,6 +127,6 @@ const updateRaftProperties = (origin, character) => {
         return;
     }
 
-    if (passenger_1 == 0) passenger_1 = character;
-    else if (passenger_2 == 0) passenger_2 = character;
+    if (passenger_1 == 0) raft_properties.passenger_1 = character;
+    else if (passenger_2 == 0) raft_properties.passenger_2 = character;
 }
