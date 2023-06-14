@@ -143,7 +143,7 @@ function start_to_river(
     move = 0.65
     face = false;
   } else if (origin == "river" && destination == "upper"){
-    move = 0.65
+    move = 0.35
     face = true;
   }
 

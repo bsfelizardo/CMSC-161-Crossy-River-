@@ -107,5 +107,5 @@ var tree_vertices = [
 
   for (let i = 0; i < tree_vertices.length; i+=4){
     if(tree_vertices[i+2] == 0.20){tree_vertices[i+2] = 1}
-    else if(tree_vertices[i+2] == 0.10){tree_vertices[i+2] = 0.30}
+    else if(tree_vertices[i+2] == 0.10){tree_vertices[i+2] = 0.90}
   }
