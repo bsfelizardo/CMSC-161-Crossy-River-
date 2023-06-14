@@ -65,6 +65,7 @@
 
   <script src="assets/land.js"></script>
   <script src="assets/character.js"></script>
+  <script src="utils/gameLogic.js"></script>
   <script> 
     function main() {
       const canvas = document.querySelector('#output');
@@ -324,6 +325,7 @@
 
       // initial render
       drawScene();
+      listen();
     }
     // call the main program
     main();
