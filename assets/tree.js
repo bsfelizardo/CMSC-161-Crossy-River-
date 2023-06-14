@@ -135,13 +135,8 @@ var tree_vertices = [
     gl.drawArrays(gl.TRIANGLES,50,6); //rightside view
     gl.drawArrays(gl.TRIANGLES,56,6); //front view
     gl.drawArrays(gl.TRIANGLES,62,6); //back view
-    // draw buffer that is bound to gl.ARRAY_BUFFER
     gl.uniform4f(colorLocation,0.36,0.66,0.02,1.0); //black outline
-    
-    //gl.drawArrays(gl.POINTS,0,4); //corner points
     gl.drawArrays(gl.LINE_LOOP,0,4); //tree perimeter
-
-    
 
     //foliage
     gl.drawArrays(gl.TRIANGLES,4,6); //top view 

@@ -206,6 +206,12 @@
         gl.drawArrays(gl.LINE_LOOP,0,4); //raft perimeter
         gl.drawArrays(gl.LINE_LOOP,24,50); //logs/rows
         gl.drawArrays(gl.LINES,4,20); //line texture
+
+        forest({
+          gl,
+          aPositionPointer,
+          colorLocation,
+        })
         
         
         // character [start]
