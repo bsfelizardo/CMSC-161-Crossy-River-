@@ -169,7 +169,7 @@
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
         // for(let i=0; i<land.length; i+=1){
           // alternating color of triangle
-          gl.uniform4f(colorLocation,0.0,1.0,0.0,1.0);
+          gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
           gl.drawArrays(gl.TRIANGLES, 0, upper_land.length/4);
         // }
 
@@ -177,7 +177,7 @@
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
         // for(let i=0; i<land.length; i+=1){
           // alternating color of triangle
-          gl.uniform4f(colorLocation,0.0,1.0,0.0,1.0);
+          gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
           gl.drawArrays(gl.TRIANGLES, 0, lower_land.length/4);
 
 
