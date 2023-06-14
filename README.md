@@ -8,6 +8,10 @@ Reference:
 
 **Canvas size**: 1280 x 720
 
+**Color Palette**
+Source: https://encycolorpedia.com/83d7ee
+- River water/main BG: #83d7ee
+
 ## First tasks allocation (Deadline: Friday, 12 May 2023):
 Characters (Sean):
 - Rectangular prisms

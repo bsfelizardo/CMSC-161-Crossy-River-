@@ -1,0 +1,815 @@
+<!doctype html>
+<html>
+<head>
+  <title>WebGL Demo</title>
+</head>
+
+<body>
+  <canvas id="output" width="1280" height="720"></canvas>
+ <br>
+ <!-- USER INTERFACE -->
+ <button id="translateX">MOVE X</button>  
+ <button id="translateY">MOVE Y</button>
+ <button id="translate">MOVE</button>
+ <button id="scale">SCALE</button>
+ <button id="rotate">ROTATE</button>
+ <br>
+ X = <input type="text" id="tx" value="0">
+ Y = <input type="text" id="ty" value="0">
+ SCALE X by = <input type="text" id="Sx" value="1">
+ SCALE Y by = <input type="text" id="Sy" value="1">
+ ROTATE by = <input type="text" id="degrees" value="0"> degrees
+ <br>
+ angleX: <input type="range" min="0" max="360" value="0" class="slider" id="rotX">
+ angleY: <input type="range" min="0" max="360" value="0" class="slider" id="rotY">
+ angleZ: <input type="range" min="0" max="360" value="0" class="slider" id="rotZ">
+<br>
+ translateX: <input type="range" min="0" max="800" value="0" class="slider" id="tranX">
+ translateY: <input type="range" min="0" max="800" value="0" class="slider" id="tranY">
+ translateZ: <input type="range" min="0" max="800" value="0" class="slider" id="tranZ">
+ <br>
+ srcRGB: 
+ <select name="srcrgb" id="srcrgb">
+  <option value="blend1">Blend 1</option>
+  <option value="blend2">Blend 2</option>
+  <option value="blend3">Blend 3</option>
+  <option value="blend4">Blend 4</option>
+  <option value="blend5">Blend 5</option>
+  <option value="blend6">Blend 6</option>
+  <option value="blend7">Blend 7</option>
+  <option value="blend8">Blend 8</option>
+  <option value="blend9">Blend 9</option>
+  <option value="blend10">Blend 10</option>
+  <option value="blend11">Blend 11</option>
+  <option value="blend12">Blend 12</option> n 
+  <option value="blend13">Blend 13</option>
+  <option value="blend14">Blend 14</option>
+  <option value="blend15">Blend 15</option>
+ </select>
+ dstRGB: 
+ <select name="dstrgb" id="dstrgb">
+  <option value="blend1">Blend 1</option>
+  <option value="blend2">Blend 2</option>
+  <option value="blend3">Blend 3</option>
+  <option value="blend4">Blend 4</option>
+  <option value="blend5">Blend 5</option>
+  <option value="blend6">Blend 6</option>
+  <option value="blend7">Blend 7</option>
+  <option value="blend8">Blend 8</option>
+  <option value="blend9">Blend 9</option>
+  <option value="blend10">Blend 10</option>
+  <option value="blend11">Blend 11</option>
+  <option value="blend12">Blend 12</option>
+  <option value="blend13">Blend 13</option>
+  <option value="blend14">Blend 14</option>
+  <option value="blend15">Blend 15</option>
+ </select>
+ Blending Function: 
+ <select name="blendfunc" id="blendfunc">
+  <option value="blend1">Additive</option>
+  <option value="blend2">Subtractive</option>
+ </select>
+
+
+
+ <button id="alphablend">BLEND</button>
+  
+   <script src="./utils/gl-matrix.js"></script>
+  <!-- VERTEX SHADER -->
+  <script id="vertex-shader" type="notjs">#version 300 es
+    in vec4 a_position;
+    in float a_point_size;
+    //transformation matrix
+    uniform mat4 u_transformation_matrix;
+    
+    //For view, model, and projection transformations
+    uniform mat4 u_model_matrix;
+    uniform mat4 u_view_matrix;
+    uniform mat4 u_projection_matrix;
+
+
+    void main() {
+      //Apply the transformations to the object to be rendered
+      gl_Position = u_transformation_matrix * u_view_matrix * u_model_matrix * u_projection_matrix * a_position;
+    
+    }
+  </script>
+
+  <!-- FRAGMENT SHADER -->
+  <script id="fragment-shader" type="notjs">#version 300 es
+    precision mediump float;
+
+    uniform vec4 u_color;
+    out vec4 outColor;
+
+    void main(void) {
+      //outColor = vec4(1, 0, 0, 1); //red
+    
+      outColor = u_color;
+    }
+
+    
+  </script>
+
+  <!-- Function for creating and compiling shader programs -->
+  <script>
+  function createShader (gl, type, sourceCode) {
+  // Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
+  var shader = gl.createShader( type );
+  gl.shaderSource( shader, sourceCode );
+  gl.compileShader( shader );
+
+  if ( !gl.getShaderParameter(shader, gl.COMPILE_STATUS) ) {
+    var info = gl.getShaderInfoLog( shader );
+    throw 'Could not compile WebGL program. \n\n' + info;
+  }
+  return shader;
+}
+</script>
+  
+  <!-- Main function contains: 
+    1) declaration of WebGL context
+    2) function calls to initialize the shader programs
+    3) declaration and binding of buffer object
+    4) function calls to perform transformations before drawing
+    5) draw/redraw functions
+  -->
+  <script> 
+    function main() {
+      const canvas = document.querySelector('#output');
+      if(!canvas){
+        console.log("Canvas element with specified ID ('output') cannot be found.");
+      }
+//const gl = initWebGL(canvas, true);
+      //Setting up the WebGL Context
+      const gl = canvas.getContext('webgl2');
+      const vertexShaderSource = document.querySelector('#vertex-shader').text;
+      const fragmentShaderSource = document.querySelector('#fragment-shader').text;
+      const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+      const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+      
+
+      //Creation and initialization of GL program 
+      var program = gl.createProgram();
+
+      // Attach pre-existing shaders
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+
+      gl.linkProgram(program);
+
+      if ( !gl.getProgramParameter( program, gl.LINK_STATUS) ) {
+        var info = gl.getProgramInfoLog(program);
+        throw 'Could not compile WebGL program. \n\n' + info;
+      }
+
+      // set the program created earlier
+      gl.useProgram(program);
+
+      // Declaration of pointers to the attributes
+      const aPositionPointer = gl.getAttribLocation(program, 'a_position');
+      const aPointSizePointer = gl.getAttribLocation(program, 'a_point_size');
+
+     var colorLocation = gl.getUniformLocation(program, "u_color");
+     
+     //Used for affine transformation
+    const uTransformationMatrixPointer = gl.getUniformLocation(program, 'u_transformation_matrix');
+    const uModelMatrixPointer = gl.getUniformLocation(program, 'u_model_matrix');
+    const uViewMatrixPointer = gl.getUniformLocation(program, 'u_view_matrix');
+    const uProjectionMatrixPointer = gl.getUniformLocation(program, 'u_projection_matrix');
+
+    var vertices1 = [
+      // head
+      -0.1, 0.7, 0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+      0.1, 0.4, 0.1, 1,
+
+      0.1, 0.4, 0.1, 1,
+      0.1, 0.7, 0.1, 1,
+      -0.1, 0.7, 0.1, 1,
+
+      // upper body
+      -0.1, 0.4, 0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+      0.1, -0.3, 0.1, 1,
+
+      0.1, -0.3, 0.1, 1,
+      0.1, 0.4, 0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+
+      // lower body
+      -0.1, -0.3, 0.1, 1,
+      -0.1, -0.7, 0.1, 1,
+      0.1, -0.7, 0.1, 1,
+
+      0.1, -0.7, 0.1, 1,
+      0.1, -0.3, 0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+    ]
+
+    // z axis
+    var vertices3 = [
+      // head
+      -0.1, 0.7, 0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+      -0.1, 0.4, -0.1, 1,
+
+      -0.1, 0.4, -0.1, 1,
+      -0.1, 0.7, -0.1, 1,
+      -0.1, 0.7, 0.1, 1,
+
+      // upper body
+      -0.1, 0.4, 0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+      -0.1, -0.3, -0.1, 1,
+
+      -0.1, -0.3, -0.1, 1,
+      -0.1, 0.4, -0.1, 1,
+      -0.1, 0.4, 0.1, 1,
+
+      // lower body
+      -0.1, -0.3, 0.1, 1,
+      -0.1, -0.7, 0.1, 1,
+      -0.1, -0.7, -0.1, 1,
+
+      -0.1, -0.7, -0.1, 1,
+      -0.1, -0.3, -0.1, 1,
+      -0.1, -0.3, 0.1, 1,
+    ]
+
+    var eyes = [
+      // eyebrow
+      -0.07, 0.57, 0, 1,
+      -0.07, 0.60, 0, 1,
+      -0.03, 0.60, 0, 1,
+
+      -0.03, 0.60, 0, 1,
+      -0.07, 0.57, 0, 1,
+      -0.03, 0.57, 0, 1,
+
+      // side
+      -0.03, 0.57, 0, 1,
+      -0.05, 0.57, 0, 1,
+      -0.05, 0.52, 0, 1,
+
+      -0.05, 0.52, 0, 1,
+      -0.03, 0.52, 0, 1,
+      -0.03, 0.57, 0, 1,
+
+      // pupil
+      -0.07, 0.57, 0, 1,
+      -0.07, 0.52, 0, 1,
+      -0.05, 0.52, 0, 1,
+
+      -0.05, 0.52, 0, 1,
+      -0.05, 0.57, 0, 1,
+      -0.07, 0.57, 0, 1,
+    ]
+
+    var line_vertices = [
+      //front view
+      //corner points 4 points
+      -0.15, 0.40, 0, 1,
+      0.15, 0.40, 0, 1,
+      0.15, -0.40, 0, 1,
+      -0.15, -0.40, 0, 1,
+
+      //line textures 20 points
+      -0.09, 0.40, 0, 1,
+      -0.09, 0.32, 0, 1,
+      0.09, 0.32, 0, 1,
+      0.09, 0.24, 0, 1,
+      0.00, 0.24, 0, 1,
+      0.00, 0.16, 0, 1,
+      -0.09, 0.16, 0, 1,
+      -0.09, 0.08, 0, 1,
+      0.09, 0.08, 0, 1,
+      0.09, 0.0, 0, 1,
+      0.00, 0, 0, 1,
+      0.00, -0.08, 0, 1,
+      -0.09, -0.08, 0, 1,
+      -0.09, -0.16, 0, 1,
+      0.09, -0.16, 0, 1,
+      0.09, -0.24, 0, 1,
+      0.00, -0.24, 0, 1,
+      0.00, -0.32, 0, 1,
+      -0.09, -0.32, 0, 1,
+      -0.09, -0.40, 0, 1,
+
+      //log 1 50 points
+      -0.15, 0.40, 0, 1,
+      -0.15, 0.32, 0, 1,
+      0.15, 0.32, 0, 1,
+      0.15, 0.40, 0, 1,
+      -0.15, 0.40, 0, 1,
+
+      //log 2
+      -0.15, 0.32, 0, 1,
+      -0.15, 0.24, 0, 1,
+      0.15, 0.24, 0, 1,
+      0.15, 0.32, 0, 1,
+      -0.15, 0.32, 0, 1,
+
+      //log 3
+      -0.15, 0.24, 0, 1,
+      -0.15, 0.16, 0, 1,
+      0.15, 0.16, 0, 1,
+      0.15, 0.24, 0, 1,
+      -0.15, 0.24, 0, 1,
+
+      //log 4
+      -0.15, 0.16, 0, 1,
+      -0.15, 0.08, 0, 1,
+      0.15, 0.08, 0, 1,
+      0.15, 0.16, 0, 1,
+      -0.15, 0.16, 0, 1,
+
+      //log 5
+      -0.15, 0.08, 0, 1,
+      -0.15, 0, 0, 1,
+      0.15, 0, 0, 1,
+      0.15, 0.08, 0, 1,
+      -0.15, 0.08, 0, 1,
+
+      //log 6
+      -0.15, 0, 0, 1,
+      -0.15, -0.08, 0, 1,
+      0.15, -0.08, 0, 1,
+      0.15, 0, 0, 1,
+      -0.15, 0, 0, 1,
+
+      //log 7
+      -0.15, -0.08, 0, 1,
+      -0.15, -0.16, 0, 1,
+      0.15, -0.16, 0, 1,
+      0.15, -0.08, 0, 1,
+      -0.15, -0.08, 0, 1,
+
+      //log 8
+      -0.15, -0.16, 0, 1,
+      -0.15, -0.24, 0, 1,
+      0.15, -0.24, 0, 1,
+      0.15, -0.16, 0, 1,
+      -0.15, -0.16, 0, 1,
+
+      //log 9
+      -0.15, -0.24, 0, 1,
+      -0.15, -0.32, 0, 1,
+      0.15, -0.32, 0, 1,
+      0.15, -0.24, 0, 1,
+      -0.15, -0.24, 0, 1,
+
+      //log 10
+      -0.15, -0.32, 0, 1,
+      -0.15, -0.40, 0, 1,
+      0.15, -0.40, 0, 1,
+      0.15, -0.32, 0, 1,
+      -0.15, -0.32, 0, 1,
+
+      //TRIANGULATION
+      //log1
+      -0.15, 0.40, 0, 1,
+      -0.15, -0.40, 0, 1,
+      0.15, 0.40, 0, 1,
+      0.15, 0.40, 0, 1,
+      0.15, -0.40, 0, 1,
+      -0.15, -0.40, 0, 1,
+
+
+      //side view left
+      -0.15, 0.40, 0, 1,
+      -0.15, 0.40, 0.20, 1,
+      -0.15, -0.40, 0.20, 1,
+
+      -0.15, 0.40, 0, 1,
+      -0.15, -0.40, 0, 1,
+      -0.15, -0.40, 0.20, 1,
+
+      //side view right
+      0.15, 0.40, 0, 1,
+      0.15, 0.40, 0.20, 1,
+      0.15, -0.40, 0.20, 1,
+
+      0.15, 0.40, 0, 1,
+      0.15, -0.40, 0, 1,
+      0.15, -0.40, 0.20, 1,
+
+      //front view
+      -0.15, -0.40, 0.20, 1,
+      0.15, -0.40, 0.20, 1,
+      -0.15, -0.40, 0, 1,
+
+      0.15, -0.40, 0.20, 1,
+      0.15, -0.40, 0, 1,
+      -0.15, -0.40, 0, 1,
+
+      //back view
+      0.15, 0.40, 0.20, 1,
+      -0.15, 0.40, 0.20, 1,
+      -0.15, 0.40, 0, 1,
+
+      0.15, 0.40, 0.20, 1,
+      0.15, 0.40, 0, 1,
+      -0.15, 0.40, 0, 1,
+
+    ];
+
+
+    //Initializing the variables and tranformation matrix
+    var angle = 0;
+    var varx=0, vary=0;
+    var mulx=1, muly=1;
+    var mulx1=0, muly1=0;
+    var transformationMatrix = [
+      mulx,mulx1,0,0,
+      muly1,muly,0,0,
+      0,0,1,0,
+      varx,vary,0,1
+    ];
+
+    vertices2 = vertices1.map((x) => x);
+    vertices4 = vertices3.map((x) => x);
+    eyes2 = eyes.map((x) => x);
+    // z1_vertex = z_vertex.map((x) => x);     
+
+    for (let i = 2; i < vertices2.length; i+=4){
+      vertices2[i] = -0.1
+    }
+
+    for (let i = 0; i < vertices4.length; i+=4){
+      vertices4[i] = 0.1
+    }
+
+    for (let i = 0; i < eyes2.length; i+=4){
+      eyes2[i] = eyes2[i] * -1
+    }
+
+    
+    // for (let i = 0; i < z1_vertex.length; i+=4){
+    //   z1_vertex[i] = z1_vertex[i] * -1
+    // }
+
+    // all_vertex = vertices2.map((x) => x);
+    // for (let i = 0; i < vertices2.length; i++){
+    //   all_vertex.push(vertices2[i])
+    // }
+    // for (let i = 0; i < z_vertex.length; i++){
+    //   all_vertex.push(z_vertex[i])
+    // }
+    // for (let i = 0; i < z1_vertex.length; i++){
+    //   all_vertex.push(z1_vertex[i])
+    // }
+
+    const vertices1B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices1B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices2B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices2B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices3B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices3), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const vertices4B = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertices4B);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices4), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const eyeBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, eyeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(eyes), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    const eye2Buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, eye2Buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(eyes2), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    //create a buffer object
+    var shapeBuffer = gl.createBuffer();
+    //Bind buffer object to a target
+    gl.bindBuffer(gl.ARRAY_BUFFER,shapeBuffer);
+    //Write data into the buffer object
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(line_vertices),gl.STATIC_DRAW);
+    //unbind the buffer
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+
+    // setup model matrix;
+    const modelMatrix = glMatrix.mat4.create();
+
+    // setup view matrix
+    const viewMatrix = glMatrix.mat4.create();
+    glMatrix.mat4.lookAt(viewMatrix,[0,0,0,1],[0,0,0,1],[0,1,0,0]);
+
+
+    // setup projection matrix
+    const projectionMatrix = glMatrix.mat4.create();
+    // parameters to set parallel projection
+    var left = -1;
+    var right = 1;
+    var bottom = -1;
+    var top = 1;
+    var near = -1;
+    var far = 1;
+    glMatrix.mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
+
+     
+
+    // function to draw the scene from the user inputs
+    function drawScene() {
+
+      // enable attrib array
+        gl.enableVertexAttribArray(aPositionPointer);
+
+        // // load uniforms (only done once; since values are same for all vertices)
+        gl.uniformMatrix4fv(uModelMatrixPointer, false, new Float32Array(modelMatrix));
+        gl.uniformMatrix4fv(uViewMatrixPointer, false, new Float32Array(viewMatrix));
+        gl.uniformMatrix4fv(uProjectionMatrixPointer, false, new Float32Array(projectionMatrix));
+        // // set values
+        gl.uniformMatrix4fv(uTransformationMatrixPointer, false, new Float32Array(transformationMatrix));
+
+        // // clear the screen
+        gl.clearColor(.6602, .6602, .6602, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, shapeBuffer);
+        gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+
+        gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        gl.drawArrays(gl.TRIANGLES, 74, 6);
+
+        gl.uniform4f(colorLocation, 0.5215, 0.3686, 0.2588, 1);
+        gl.drawArrays(gl.TRIANGLES, 80, 12);
+
+        gl.uniform4f(colorLocation, 0.4, 0.4, 0.4, 1);
+        gl.drawArrays(gl.TRIANGLES, 92, 12);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, vertices2B);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.9);
+        // gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, vertices1B);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0.8510, 0.7490, 0.5176, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, vertices3B);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.7);
+        // gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        
+        // gl.bindBuffer(gl.ARRAY_BUFFER, vertices4B);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 0.8);
+        // gl.drawArrays(gl.TRIANGLES, 0, 18);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, eyeBuffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 12);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, eyeBuffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 255, 255, 255, 1);
+        // gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, eye2Buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 12);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, eye2Buffer);
+        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
+        // gl.uniform4f(colorLocation, 255, 255, 255, 1);
+        // gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+              //Buffer object to be accessed by gl.ARRAY_BUFFER
+
+
+
+// //Assign the buffer object to an attribute variable
+// gl.vertexAttribPointer(aPositionPointer,4,gl.FLOAT,false,0,0);
+// //Enable assignment
+// gl.enableVertexAttribArray(aPositionPointer);
+
+// gl.uniform4f(colorLocation,0.5215,0.3686,0.2588,1.0);
+// gl.drawArrays(gl.TRIANGLES,74,30);
+
+
+// // draw buffer that is bound to gl.ARRAY_BUFFER
+// gl.uniform4f(colorLocation,0,0,0,1.0); //black outline
+
+// gl.vertexAttrib1f(aPointSizePointer, 5.0);
+// //gl.drawArrays(gl.POINTS,0,4); //corner points
+// gl.drawArrays(gl.LINE_LOOP,0,4); //raft perimeter
+// gl.drawArrays(gl.LINE_LOOP,24,50); //logs/rows
+// gl.drawArrays(gl.LINES,4,20); //line texture
+
+// gl.drawArrays(gl.POINTS,80,6); //corner points
+
+
+
+
+
+
+
+
+      }
+
+    // initial render
+    drawScene();
+    function redraw(code){
+      return function(){
+        //Declaration and initialization of translation,scaling,rotation factors
+        let tr_x=0, tr_y=0, Sx=1, Sy=1;
+      
+        if (code=="tx") tr_x = (document.getElementById("tx")).value; 
+        if (code=="ty") tr_y = (document.getElementById("ty")).value;
+        if (code=="both"){
+          tr_x = (document.getElementById("tx")).value; 
+          tr_y = (document.getElementById("ty")).value;
+        }
+        // if (code == "degrees") angle = (document.getElementById("degrees")).value; 
+        
+        varx = parseFloat(varx) + parseFloat(tr_x)
+        vary = parseFloat(vary) + parseFloat(tr_y)
+
+        
+        if (code!="scaled"){
+          if (code == "degrees"){
+            //For ROTATION
+            angle_temp = (document.getElementById("degrees")).value;
+            angle = parseFloat(angle) + parseFloat(angle_temp)
+            let radians = Math.PI*angle/180;
+            let cosValue = Math.cos(radians);
+            let sinValue = Math.sin(radians);
+
+            transformationMatrix = [
+              cosValue, -sinValue, 0, 0,
+              sinValue, cosValue, 0, 0,
+              0,0,1,0,
+              varx, vary,0,1
+            ]
+
+          } else {
+            transformationMatrix = [
+            mulx,mulx1,0,0,
+            muly1,muly,0,0,
+            0,0,1,0,
+            varx,vary,0,1
+            ];
+          }
+        }
+        if (code=="scaled"){
+          Sx = (document.getElementById("Sx")).value;
+          Sy = (document.getElementById("Sy")).value;
+
+          mulx = parseFloat(mulx) * parseFloat(Sx)
+          muly = parseFloat(muly) * parseFloat(Sy)
+
+          //Transformation matrix when scaling
+          transformationMatrix = [
+          mulx,mulx1,0,0,
+          muly1,muly,0,0,
+          0,0,1,0,
+          varx,vary,0,1
+          ];
+        }
+
+        
+        if (code=="rotateX"){
+          let angleX = (document.getElementById("rotX")).value;
+          glMatrix.mat4.rotateX(transformationMatrix, viewMatrix, glMatrix.glMatrix.toRadian(angleX));
+        }
+
+        if (code=="rotateY"){
+          let angleY = (document.getElementById("rotY")).value;
+          glMatrix.mat4.rotateY(transformationMatrix, viewMatrix, glMatrix.glMatrix.toRadian(angleY));
+        }
+        
+        if (code=="rotateZ"){
+          let angleZ = (document.getElementById("rotZ")).value;
+          glMatrix.mat4.rotateZ(transformationMatrix, viewMatrix, glMatrix.glMatrix.toRadian(angleZ));
+        }
+
+
+
+        if (code=="translate"){
+          valX= (document.getElementById("tranX")).value / 800;
+          valY= (document.getElementById("tranY")).value / 800;
+          valZ= (document.getElementById("tranY")).value / 800;
+          glMatrix.mat4.translate(transformationMatrix, viewMatrix, [valX,valY,valZ]);
+        }
+
+        if (code == "blend"){
+          var radios = document.getElementById('srcrgb');
+          var radios1 = document.getElementById('dstrgb');
+          var radios2 = document.getElementById('blendfunc');
+              if (radios.value == "blend1") {
+                srcrgb = gl.ZERO
+              }else if(radios.value == "blend2"){
+                srcrgb = gl.ONE
+              }else if(radios.value == "blend3"){
+                srcrgb = gl.SRC_COLOR
+              }else if(radios.value == "blend4"){
+                srcrgb = gl.ONE_MINUS_SRC_COLOR
+              }else if(radios.value == "blend5"){
+                srcrgb = gl.DST_COLOR
+              }else if(radios.value == "blend6"){
+                srcrgb = gl.ONE_MINUS_DST_COLOR
+              }else if(radios.value == "blend7"){
+                srcrgb = gl.SRC_ALPHA
+              }else if(radios.value == "blend8"){
+                srcrgb = gl.ONE_MINUS_SRC_ALPHA
+              }else if(radios.value == "blend9"){
+                srcrgb = gl.DST_ALPHA
+              }else if(radios.value == "blend10"){
+                srcrgb = gl.ONE_MINUS_DST_ALPHA
+              }else if(radios.value == "blend11"){
+                srcrgb = gl.CONSTANT_COLOR
+              }else if(radios.value == "blend12"){
+                srcrgb = gl.ONE_MINUS_CONSTANT_COLOR
+              }else if(radios.value == "blend13"){
+                srcrgb = gl.CONSTANT_ALPHA
+              }else if(radios.value == "blend14"){
+                srcrgb = gl.ONE_MINUS_CONSTANT_ALPHA
+              }else if(radios.value == "blend15"){
+                srcrgb = gl.SRC_ALPHA_SATURATE
+              }
+
+              if (radios1.value == "blend1") {
+                dstrgb = gl.ZERO
+              }else if(radios1.value == "blend2"){
+                dstrgb = gl.ONE
+              }else if(radios1.value == "blend3"){
+                dstrgb = gl.SRC_COLOR
+              }else if(radios1.value == "blend4"){
+                dstrgb = gl.ONE_MINUS_SRC_COLOR
+              }else if(radios1.value == "blend5"){
+                dstrgb = gl.DST_COLOR
+              }else if(radios1.value == "blend6"){
+                dstrgb = gl.ONE_MINUS_DST_COLOR
+              }else if(radios1.value == "blend7"){
+                dstrgb = gl.SRC_ALPHA
+              }else if(radios1.value == "blend8"){
+                dstrgb = gl.ONE_MINUS_SRC_ALPHA
+              }else if(radios1.value == "blend9"){
+                dstrgb = gl.DST_ALPHA
+              }else if(radios1.value == "blend10"){
+                dstrgb = gl.ONE_MINUS_DST_ALPHA
+              }else if(radios1.value == "blend11"){
+                dstrgb = gl.CONSTANT_COLOR
+              }else if(radios1.value == "blend12"){
+                dstrgb = gl.ONE_MINUS_CONSTANT_COLOR
+              }else if(radios1.value == "blend13"){
+                dstrgb = gl.CONSTANT_ALPHA
+              }else if(radios1.value == "blend14"){
+                dstrgb = gl.ONE_MINUS_CONSTANT_ALPHA
+              }else if(radios1.value == "blend15"){
+                dstrgb = gl.SRC_ALPHA_SATURATE
+              }
+
+              if (radios2.value == "blend1") {
+                blendfunc = gl.FUNC_ADD
+              }else if(radios2.value == "blend2"){
+                blendfunc = gl.FUNC_SUBTRACT
+              }
+
+              gl.blendFunc(srcrgb,dstrgb);
+              gl.blendEquation(blendfunc);
+
+        }
+
+      drawScene();
+    }
+  }
+
+  //Event listeners for user inputs for the transformations
+  document.getElementById("translateX").addEventListener("click", redraw("tx"));
+  document.getElementById("translateY").addEventListener("click", redraw("ty"));
+  document.getElementById("translate").addEventListener("click", redraw("both"));
+  document.getElementById("scale").addEventListener("click",redraw("scaled"));
+  document.getElementById("rotate").addEventListener("click",redraw("degrees"));
+  document.getElementById("rotX").addEventListener("input",redraw("rotateX"));
+  document.getElementById("rotY").addEventListener("input",redraw("rotateY"));
+  document.getElementById("rotZ").addEventListener("input",redraw("rotateZ"));
+
+  document.getElementById("tranX").addEventListener("input",redraw("translate"));
+  document.getElementById("tranY").addEventListener("input",redraw("translate"));
+  document.getElementById("tranZ").addEventListener("input",redraw("translate"));
+  document.getElementById("alphablend").addEventListener("click",redraw("blend"));
+
+}
+    // call the main program
+    main();
+  </script>
+</body>
+</html>
