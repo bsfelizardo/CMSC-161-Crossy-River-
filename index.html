@@ -74,6 +74,7 @@
   <script src="assets/character7.js"></script>
   <script src="assets/raft.js"></script>
   <script src="assets/tree.js"></script>
+  <script src="utils/gameLogic.js"></script>
   <script> 
     function main() {
       const canvas = document.querySelector('#output');
@@ -164,10 +165,9 @@
       var far = 1;
       glMatrix.mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
 
-     
 
       // function to draw the scene from the user inputs
-      function drawScene() {
+      function drawScene({destination, origin, character}) {
         // enable attrib array
         gl.enableVertexAttribArray(aPositionPointer);
         
@@ -186,12 +186,14 @@
         //same for the other object to be drawn
         gl.bindBuffer(gl.ARRAY_BUFFER, square1Buffer);
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation,0.0,1.0,0.0,1.0);
+        // alternating color of triangle
+        gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
         gl.drawArrays(gl.TRIANGLES, 0, upper_land.length/4);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, lower_land_buffer);
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.uniform4f(colorLocation,0.0,1.0,0.0,1.0);
+        // alternating color of triangle
+        gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
         gl.drawArrays(gl.TRIANGLES, 0, lower_land.length/4);
 
         gl.disable(gl.DEPTH_TEST);
@@ -205,86 +207,54 @@
         gl.drawArrays(gl.LINE_LOOP,24,50); //logs/rows
         gl.drawArrays(gl.LINES,4,20); //line texture
         
-        forest(
-        {
-          gl,
-          aPositionPointer,
-          colorLocation,
-        })
-
-        
         
         // character [start]
-        start_to_river7(
-        {destination:"start",
-          origin: "start",
+        start_to_river5({
+          destination: character == 3 ? destination : "start",
+          origin: character == 3 ? origin : "start",
+          gl,
+          aPositionPointer,
+          colorLocation,
+        })
+        start_to_river({
+          destination: character == 4 ? destination : "start",
+          origin: character == 4 ? origin : "start",
           gl,
           aPositionPointer,
           colorLocation,
         })
 
-        start_to_river6(
-        {destination:"start",
-          origin: "start",
+        start_to_river1({
+          destination: character == 5 ? destination : "start",
+          origin: character == 5 ? origin : "start",
           gl,
           aPositionPointer,
           colorLocation,
         })
 
-        start_to_river5(
-        {destination:"start",
-          origin: "start",
+        start_to_river2({
+          destination: character == 6 ? destination : "start",
+          origin: character == 6 ? origin : "start",
           gl,
           aPositionPointer,
           colorLocation,
         })
 
-        start_to_river(
-          {destination:"start",
-            origin: "start",
-            gl,
-            aPositionPointer,
-            colorLocation,
-          })
-
-        start_to_river1(
-          {destination:"start",
-            origin: "start",
-            gl,
-            aPositionPointer,
-            colorLocation,
-          })
-
-        start_to_river2(
-        {destination:"start",
-          origin: "start",
+        start_to_river3({
+          destination: character == 7 ? destination : "start",
+          origin: character == 7 ? origin : "start",
           gl,
           aPositionPointer,
           colorLocation,
         })
 
-        start_to_river3(
-        {destination:"start",
-          origin: "start",
+        start_to_river4({
+          destination: character == 8 ? destination : "start",
+          origin: character == 8 ? origin : "start",
           gl,
           aPositionPointer,
           colorLocation,
         })
-
-        start_to_river4(
-        {destination:"start",
-          origin: "start",
-          gl,
-          aPositionPointer,
-          colorLocation,
-        })
-
-
-
-
-
-
-
         
         // character [end]
 
@@ -325,7 +295,8 @@
       }
 
       // initial render
-      drawScene();
+      drawScene({destination: "start", origin: "start", character: 0});
+      listen(drawScene);
     }
     // call the main program
     main();
