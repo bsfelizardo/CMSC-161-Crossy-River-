@@ -186,10 +186,12 @@
       var far = 1;
       glMatrix.mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
 
-     
+     var movementFunctions = [
+      
+     ]
 
       // function to draw the scene from the user inputs
-      function drawScene() {
+      function drawScene({destination, origin}) {
         // enable attrib array
         gl.enableVertexAttribArray(aPositionPointer);
         
@@ -208,122 +210,27 @@
         //same for the other object to be drawn
         gl.bindBuffer(gl.ARRAY_BUFFER, square1Buffer);
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // for(let i=0; i<land.length; i+=1){
-          // alternating color of triangle
-          gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
-          gl.drawArrays(gl.TRIANGLES, 0, upper_land.length/4);
-        // }
+        // alternating color of triangle
+        gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
+        gl.drawArrays(gl.TRIANGLES, 0, upper_land.length/4);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, lower_land_buffer);
         gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // for(let i=0; i<land.length; i+=1){
-          // alternating color of triangle
-          gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
-          gl.drawArrays(gl.TRIANGLES, 0, lower_land.length/4);
+        // alternating color of triangle
+        gl.uniform4f(colorLocation, 0.4392, 0.7294, 0.098, 1.0);
+        gl.drawArrays(gl.TRIANGLES, 0, lower_land.length/4);
 
         gl.disable(gl.DEPTH_TEST);
-        // character [start]
         
-       
-        
-        start_to_river(
-          {destination:"start",
-            origin: "start",
-            gl,
-            aPositionPointer,
-            colorLocation,
-          })
-
-          start_to_river(
-          {destination:"river",
-            origin: "upper",
-            gl,
-            aPositionPointer,
-            colorLocation,
-          })
-
-          start_to_river(
-          {destination:"lower",
-            origin: "river",
-            gl,
-            aPositionPointer,
-            colorLocation,
-          })
-
-
-          start_to_river(
-          {destination:"river",
-            origin: "lower",
-            gl,
-            aPositionPointer,
-            colorLocation,
-          })
-
-
-          
-        // gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        // gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, left_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 18);
-       
-        // gl.bindBuffer(gl.ARRAY_BUFFER, back_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        // gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 18);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 12);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 255, 255, 255, 1);
-        // gl.drawArrays(gl.TRIANGLES, 12, 6);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 12);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 255, 255, 255, 1);
-        // gl.drawArrays(gl.TRIANGLES, 12, 6);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, right_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 18);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, top_buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // gl.uniform4f(colorLocation, 0, 0, 0, 1);
-        // gl.drawArrays(gl.TRIANGLES, 0, 12);
-        
-        // character [end]
+        start_to_river({
+          destination,
+          origin,
+          gl,
+          aPositionPointer,
+          colorLocation,
+        })
 
         gl.enable(gl.DEPTH_TEST);
-
-
-        //   // load shader variables
-        // gl.uniform4fv(colorLocation,color1);
-        // //binding gl.ARRAY_BUFFER to the vertices of the object to be drawn
-        // gl.bindBuffer(gl.ARRAY_BUFFER, square1Buffer);
-        // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-        // // Draw triangles
-        // for(let i=0; i<square1_vertices.length/4; i+=3){
-        //   // alternating color of triangle
-        //   i%6==0?gl.uniform4f(colorLocation,0.0,0.0,1.0,1.0):gl.uniform4f(colorLocation,0.0,0.5,1.0,1.0);
-        //   gl.drawArrays(gl.TRIANGLES, i, 3);
-        // }
 
         const x_axis_buffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, x_axis_buffer);
@@ -360,8 +267,8 @@
       }
 
       // initial render
-      drawScene();
-      listen();
+      drawScene({destination: "start", origin: "start"});
+      listen(drawScene);
     }
     // call the main program
     main();
