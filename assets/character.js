@@ -175,9 +175,6 @@ function start_to_river(
     char_head_righteye[i+2] += move
   }
 
-  console.log(move)
-  
-
   const front_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_front), gl.DYNAMIC_DRAW);
@@ -213,12 +210,9 @@ function start_to_river(
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_top), gl.STATIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
     
-  console.log(face)
-  console.log(move)
   if(face == true){
     gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
     gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -229,7 +223,6 @@ function start_to_river(
     
     gl.bindBuffer(gl.ARRAY_BUFFER, back_buffer);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
     gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
     gl.drawArrays(gl.TRIANGLES, 0, 18);
 
@@ -267,7 +260,6 @@ function start_to_river(
 
     gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
     gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -278,29 +270,8 @@ function start_to_river(
     
     gl.bindBuffer(gl.ARRAY_BUFFER, back_buffer);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
     gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
     gl.drawArrays(gl.TRIANGLES, 0, 18);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
-    // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 0, 0, 0, 1);
-    // gl.drawArrays(gl.TRIANGLES, 0, 12);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
-    // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 255, 255, 255, 1);
-    // gl.drawArrays(gl.TRIANGLES, 12, 6);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
-    // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 0, 0, 0, 1);
-    // gl.drawArrays(gl.TRIANGLES, 0, 12);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
-    // gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-    // gl.uniform4f(colorLocation, 255, 255, 255, 1);
-    // gl.drawArrays(gl.TRIANGLES, 12, 6);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, right_buffer);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
@@ -312,62 +283,4 @@ function start_to_river(
     gl.uniform4f(colorLocation, 0, 0, 0, 1);
     gl.drawArrays(gl.TRIANGLES, 0, 12);
   }
-
-
-  // console.log(destination)
-  // switch (destination){
-    
-  //   case "start" || "upper" || "river":
-  //     console.log("SEAN")
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-  //     gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 6);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, left_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 18);
-     
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, back_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     // gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-  //     gl.uniform4f(colorLocation, 0.9216, 0.8588, 0.4039, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 18);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 0, 0, 0, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 12);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, lefteye_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 255, 255, 255, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 12, 6);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 0, 0, 0, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 12);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, righteye_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 255, 255, 255, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 12, 6);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, right_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 0.9766, 0.5039, 0.1406, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 18);
-  
-  //     gl.bindBuffer(gl.ARRAY_BUFFER, top_buffer);
-  //     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
-  //     gl.uniform4f(colorLocation, 0, 0, 0, 1);
-  //     gl.drawArrays(gl.TRIANGLES, 0, 12);
-  //     break;
-
-  //   default: break;
-  // }
-
 }

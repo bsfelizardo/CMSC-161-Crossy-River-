@@ -177,9 +177,6 @@ function start_to_river1(
     char_head_righteye1[i+2] += move
   }
 
-  console.log(move)
-  
-
   const front_buffer1 = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer1);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_front1), gl.DYNAMIC_DRAW);
@@ -215,8 +212,6 @@ function start_to_river1(
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_top1), gl.STATIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
     
-  console.log(face)
-  console.log(move)
   if(face == true){
     gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer1);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);

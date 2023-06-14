@@ -174,8 +174,6 @@ function start_to_river6(
   for (let i = 0; i < char_head_righteye6.length; i+=4){
     char_head_righteye6[i+2] += move
   }
-
-  console.log(move)
   
 
   const front_buffer6 = gl.createBuffer();
@@ -212,9 +210,6 @@ function start_to_river6(
   gl.bindBuffer(gl.ARRAY_BUFFER, top_buffer6);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(char_head_top6), gl.STATIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    
-  console.log(face)
-  console.log(move)
   if(face == true){
     gl.bindBuffer(gl.ARRAY_BUFFER, front_buffer6);
     gl.vertexAttribPointer(aPositionPointer, 4, gl.FLOAT, false, 0, 0);
