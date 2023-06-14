@@ -4,6 +4,7 @@ var raft_properties = {
 }
 
 var characters = [
+    {},
     {   // father
         location: "upper",
         adult: true,
@@ -55,25 +56,38 @@ const listen = (cb) => {
     window.onkeyup = (key) => {
         console.log(key.key);
 
-        if ([1,2,3,4,5,6,7,8].includes(parseInt(key.key))) character = parseInt(key.key)-1;
+        if ([1,2,3,4,5,6,7,8].includes(parseInt(key.key))) character = parseInt(key.key);
 
-        if (key.key == "ArrowUp" || key.key == "ArrowDown" && character == 0) console.log("Error: move without selected character");
+        console.log(`character: ${character}`)
+
+        if ((key.key == "ArrowUp" || key.key == "ArrowDown") && character == 0) console.log("Error: move without selected character");
 
         else {
             move = key.key;
 
             // check if move is valid
             if (!checkIfValid(characters[character].location, move)) return;
+            console.log("after check if valid")
 
             // check if raft is full
             if (raft_properties.passenger_1>0 && raft_properties.passenger_2>0) return;
+            console.log("after check of passenger")
 
             // check compatibility with other passengers
             if (raft_properties.passenger_1>0 || raft_properties.passenger_2>0 && !compatible(character)) return;
+            console.log("after check of compatibility")
 
             // do specified actions
-            origin = characters[character].location
-            destination = getDestination(origin, move)
+            const origin = characters[character].location
+            const destination = getDestination(origin, move)
+
+            cb({destination, origin, character:character})
+
+            characters[character].location = destination
+
+            updateRaftProperties(origin, character)
+
+
         }
     }
 }
@@ -89,6 +103,8 @@ const compatible = (character) => {
 
     if (characters[current].not_compatible.includes(character)) return false;
 
+    if (!characters[current].adult && !characters[character.adult]) return false;
+
     return true
 }
 
@@ -98,4 +114,16 @@ const getDestination = (origin, move) => {
     if (move == "ArrowDown" && origin == "upper") return "river"
     if (move == "ArrowDown" && origin == "river") return "lower"
     return null
+}
+
+const updateRaftProperties = (origin, character) => {
+    const {passenger_1, passenger_2} = raft_properties
+    if (origin == "river") {
+        if (character == passenger_1) passenger_1 = 0;
+        if (character == passenger_2) passenger_2 = 0;
+        return;
+    }
+
+    if (passenger_1 == 0) passenger_1 = character;
+    else if (passenger_2 == 0) passenger_2 = character;
 }
