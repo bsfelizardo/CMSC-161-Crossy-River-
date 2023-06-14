@@ -140,13 +140,12 @@ function start_to_river(
     move = -0.65
     face = false;
   } else if (origin == "lower" && destination == "river"){
-    move = 0.35
+    move = 0.65
     face = false;
   } else if (origin == "river" && destination == "upper"){
-    move = 0.35
+    move = 0.65
     face = true;
   }
-  console.log(move)
 
   for (let i = 0; i < char_head_front.length; i+=4){
     char_head_front[i+2] += move
