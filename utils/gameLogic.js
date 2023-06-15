@@ -8,12 +8,12 @@ var characters = [
     {   // father
         location: "upper",
         adult: true,
-        not_compatible: [5,6]
+        not_compatible: [6,7]
     },
     {   // mother
         location: "upper",
         adult: true,
-        not_compatible: [3,4]
+        not_compatible: [4,5]
     },
     {   // police
         location: "upper",
@@ -23,27 +23,27 @@ var characters = [
     {   // Boy 1
         location: "upper",
         adult: false,
-        not_compatible: [1]
+        not_compatible: [2,8]
     },
     {   // Boy 2
         location: "upper",
         adult: false,
-        not_compatible: [1]
+        not_compatible: [2,8]
     },
     {   // Girl 1
         location: "upper",
         adult: false,
-        not_compatible: [0]
+        not_compatible: [1,8]
     },
     {   // Girl 2
         location: "upper",
         adult: false,
-        not_compatible: [0]
+        not_compatible: [1,8]
     },
     {   // Thief
         location: "upper",
         adult: false,
-        not_compatible: [0,1,3,4,5,6]
+        not_compatible: [1,2,4,5,6,7]
     },
 ]
 
@@ -105,7 +105,7 @@ const listen = (cb) => {
 
             updateRaftProperties(origin, character)
 
-
+            if (winner()) window.alert("CONGRATS! YOU WON.")
         }
     }
 }
@@ -152,4 +152,11 @@ const updateRaftProperties = (origin, character) => {
 
     if (passenger_1 == 0) raft_properties.passenger_1 = character;
     else if (passenger_2 == 0) raft_properties.passenger_2 = character;
+}
+
+const winner = () => {
+    for (var i=1; i<characters.length; i++) {
+        if (characters[i].location != "lower") return false;
+    }
+    return true;
 }
